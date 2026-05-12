@@ -7,6 +7,35 @@ available on demand.
 
 Current release: `v10.0.0`
 
+## Init And Enforcement Model
+
+CoGOS v10 is not a true PID 1 cognitive kernel. The full OS build preserves
+the native Puppy/Trixie init path, then starts CoGOS through
+`/etc/init.d/90cogos` as an early runtime service.
+
+Actual process ownership:
+
+- Native Puppy/Trixie init owns PID 1.
+- `/etc/init.d/90cogos` reads `/opt/cogos/config/boot_profile.json`.
+- `90cogos` launches `cogos_boot.py --boot` for boot verification.
+- `90cogos` launches `cogos_daemon.py --daemon` as the governed runtime
+  process.
+- `aris_runtime.py` is staged runtime code; it is not PID 1 and does not own
+  the process tree.
+- `cognitive_init` remains in the image as a prototype PID 1 entrypoint, but
+  the full OS remaster intentionally preserves native init instead of replacing
+  it.
+
+Law enforcement in v10 is therefore CoGOS-runtime enforcement, not kernel-level
+pre-process enforcement. CoGOS actions such as module admission, module
+execution, trace verification, trait audit, pattern ingest, and proof flows go
+through the law engine after the native OS has booted far enough to start the
+CoGOS service.
+
+The precise claim for v10 is: fast governed runtime layer on Puppy/Trixie with
+early boot verification and governed CoGOS commands. It is not yet a
+pre-process mandatory enforcement kernel.
+
 ## What v10 Does
 
 - Fast operator boot with `/opt/cogos/config/boot_profile.json`.

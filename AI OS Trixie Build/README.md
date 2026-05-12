@@ -61,6 +61,14 @@ Project Infi / ARIS as a normal startup layer through `/etc/init.d/90cogos`.
 The prototype `/opt/cogos/bin/cognitive_init` remains available in the image,
 but it is not used as PID 1 by the full OS build.
 
+`aris_runtime.py` is staged runtime code, not the init process. In v10, the
+persistent CoGOS process is `cogos_daemon.py --daemon`, launched by `90cogos`
+after native Puppy/Trixie init has started the service layer.
+
+Law enforcement is runtime-scoped. CoGOS-governed actions route through the law
+engine, but native OS processes are not blocked by a pre-process CoGOS kernel
+gate in this release.
+
 On boot:
 
 1. TrixiePup boots normally through its native init and service scripts.
