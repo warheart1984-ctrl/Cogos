@@ -1,6 +1,6 @@
 param(
   [string]$VmName = "Project-Infi-ARIS-Trixie-CoGOS",
-  [string]$IsoPath = "E:\project-infi\AI OS Trixie Build\output\project-infi-aris-trixie-full-os-v11.iso",
+  [string]$IsoPath = "E:\project-infi\AI OS Trixie Build\output\project-infi-aris-trixie-full-os-v12.iso",
   [string]$StatusPath = "E:\project-infi\AI OS Trixie Build\output\hyperv-full-os-status.txt",
   [string]$MemoryStartupBytes = "6GB",
   [int]$ProcessorCount = 4

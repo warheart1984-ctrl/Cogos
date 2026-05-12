@@ -1,6 +1,6 @@
 {
   "name": "Project Infi / ARIS Cognitive OS Runtime",
-  "version": "0.11",
+  "version": "0.12",
   "root": "/opt/cogos",
   "paths": {
     "runtime": "/opt/cogos/runtime",
@@ -11,6 +11,19 @@
     "tasks": "/opt/cogos/tasks",
     "traces": "/opt/cogos/memory/traces",
     "events": "/opt/cogos/memory/events"
+  },
+  "ul_runtime": {
+    "path": "/opt/cogos/runtime/ul",
+    "runs": "/opt/cogos/memory/ul/runs.jsonl",
+    "substrate_audit": "/opt/cogos/memory/ul/substrate_audit.jsonl",
+    "examples": "/opt/cogos/examples/ul"
+  },
+  "voss_runtime": {
+    "path": "/opt/cogos/runtime/voss",
+    "rep_traces": "/opt/cogos/memory/voss/rep_traces.jsonl",
+    "verifications": "/opt/cogos/memory/voss/verifications.jsonl",
+    "bindings": "/opt/cogos/memory/voss/bindings.jsonl",
+    "proof": "/opt/cogos/memory/voss/proof.jsonl"
   },
   "boot": {
     "entrypoint": "/opt/cogos/bin/cognitive_init",

@@ -2,7 +2,7 @@ param(
   [string]$VmName = "Project-Infi-ARIS-Trixie-CoGOS",
   [string]$MemoryStartupBytes = "6GB",
   [int]$ProcessorCount = 4,
-  [string]$StatusPath = "E:\project-infi\AI OS Trixie Build\output\hyperv-v11-tune-status.txt"
+  [string]$StatusPath = "E:\project-infi\AI OS Trixie Build\output\hyperv-v12-tune-status.txt"
 )
 
 $ErrorActionPreference = "Stop"

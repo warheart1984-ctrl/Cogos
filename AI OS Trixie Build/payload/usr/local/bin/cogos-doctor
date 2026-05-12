@@ -62,6 +62,15 @@ echo
 echo "== Pattern proof =="
 cogos-patterns prove 2>&1
 echo
+echo "== UL trace =="
+cogos-ul trace /opt/cogos/examples/ul/hello.ul 2>&1
+echo
+echo "== UL substrate =="
+cogos-ul substrate /opt/cogos/examples/ul/safe_substrate.ulsub 2>&1
+echo
+echo "== VOSS proof =="
+cogos-voss proof 2>&1
+echo
 echo "== Proof summary =="
 cogos-proof 2>&1
 echo

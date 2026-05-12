@@ -22,8 +22,11 @@ echo "  modules      - list governed modules"
 echo "  module-run ID - run admitted module through sandbox"
 echo "  traits      - list trait identity state"
 echo "  patterns    - list Pattern Ledger entries"
+echo "  ul          - run UL hello trace"
+echo "  substrate   - run safe UL substrate"
+echo "  voss        - run VOSS proof"
 echo "  proof        - run known-good proof summary"
-echo "  operator     - show fast v11 operator surface"
+echo "  operator     - show fast v12 operator surface"
 echo "  pid1-proof   - show PID 1 gate proof"
 echo "  perf         - show VM/runtime performance"
 echo "  dashboard    - print dashboard URL"
@@ -86,6 +89,15 @@ while true; do
       ;;
     patterns)
       cogos-patterns list
+      ;;
+    ul)
+      cogos-ul trace /opt/cogos/examples/ul/hello.ul
+      ;;
+    substrate)
+      cogos-ul substrate /opt/cogos/examples/ul/safe_substrate.ulsub
+      ;;
+    voss)
+      cogos-voss proof
       ;;
     proof)
       cogos-proof

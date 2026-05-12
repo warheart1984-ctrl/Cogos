@@ -32,6 +32,8 @@ $required = @(
   "..\..\usr\local\bin\cogos-operator",
   "..\..\usr\local\bin\cogos-perf",
   "..\..\usr\local\bin\cogos-pid1-proof",
+  "..\..\usr\local\bin\cogos-ul",
+  "..\..\usr\local\bin\cogos-voss",
   "law\root_law.json",
   "law\boot_law.json",
   "law\governance_rules.json",
@@ -52,7 +54,13 @@ $required = @(
   "runtime\aais_unified.py",
   "runtime\aris_runtime.py",
   "runtime\ul_core.py",
-  "runtime\forge_eval.py"
+  "runtime\forge_eval.py",
+  "runtime\ul\ul_lang.py",
+  "runtime\ul\ul_substrate.py",
+  "runtime\voss\voss_binary.py",
+  "runtime\voss\voss_binding.py",
+  "examples\ul\hello.ul",
+  "examples\ul\safe_substrate.ulsub"
 )
 
 $missing = @()

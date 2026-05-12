@@ -1,5 +1,5 @@
 #!/bin/sh
-echo "== CoGOS v11 performance =="
+echo "== CoGOS v12 performance =="
 echo
 echo "== PID 1 proof =="
 cogos-pid1-proof 2>&1 || true

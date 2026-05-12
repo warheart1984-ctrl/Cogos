@@ -7,7 +7,7 @@ Usage:
   bash scripts/build_trixie_cogos.sh /path/to/TrixiePup64-Wayland-2601-260502.iso
 
 Output:
-  output/project-infi-aris-trixie-full-os-v11.iso
+  output/project-infi-aris-trixie-full-os-v12.iso
 
 Required Linux tools:
   unsquashfs mksquashfs xorriso rsync
@@ -22,7 +22,7 @@ fi
 ISO="$(readlink -f "$1")"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="${COGOS_WORK:-$ROOT/work}"
-OUT="${COGOS_OUT:-$ROOT/output/project-infi-aris-trixie-full-os-v11.iso}"
+OUT="${COGOS_OUT:-$ROOT/output/project-infi-aris-trixie-full-os-v12.iso}"
 PAYLOAD="$ROOT/payload"
 
 for tool in unsquashfs mksquashfs xorriso rsync find; do
@@ -62,7 +62,7 @@ rsync -aH "$PAYLOAD/" "$WORK/rootfs/"
 chmod +x "$WORK/rootfs/opt/cogos/bin/cognitive_init" "$WORK/rootfs/opt/cogos/bin/cogos_shell" "$WORK/rootfs/opt/cogos/bin/cogos_boot.py" "$WORK/rootfs/opt/cogos/bin/cogos_daemon.py" "$WORK/rootfs/opt/cogos/bin/cogos_dashboard.py" "$WORK/rootfs/opt/cogos/bin/cogos_operator_boot.py"
 
 echo "[6/8] Install CoGOS PID 1 gatekeeper and startup layer"
-chmod +x "$WORK/rootfs/etc/init.d/90cogos" "$WORK/rootfs/usr/local/bin/cogos-status" "$WORK/rootfs/usr/local/bin/cogos-shell" "$WORK/rootfs/usr/local/bin/cogos-doctor" "$WORK/rootfs/usr/local/bin/cogos-daemon" "$WORK/rootfs/usr/local/bin/cogos-run" "$WORK/rootfs/usr/local/bin/cogos-task" "$WORK/rootfs/usr/local/bin/cogos-trace" "$WORK/rootfs/usr/local/bin/cogos-law" "$WORK/rootfs/usr/local/bin/cogos-admit" "$WORK/rootfs/usr/local/bin/cogos-snapshot" "$WORK/rootfs/usr/local/bin/cogos-reflect" "$WORK/rootfs/usr/local/bin/cogos-dashboard" "$WORK/rootfs/usr/local/bin/cogos-dashboard-start" "$WORK/rootfs/usr/local/bin/cogos-dashboard-stop" "$WORK/rootfs/usr/local/bin/cogos-desktop-hint" "$WORK/rootfs/usr/local/bin/cogos-verify-trace" "$WORK/rootfs/usr/local/bin/cogos-governance-test" "$WORK/rootfs/usr/local/bin/cogos-module" "$WORK/rootfs/usr/local/bin/cogos-traits" "$WORK/rootfs/usr/local/bin/cogos-patterns" "$WORK/rootfs/usr/local/bin/cogos-proof" "$WORK/rootfs/usr/local/bin/cogos-operator" "$WORK/rootfs/usr/local/bin/cogos-perf" "$WORK/rootfs/usr/local/bin/cogos-pid1-proof"
+chmod +x "$WORK/rootfs/etc/init.d/90cogos" "$WORK/rootfs/usr/local/bin/cogos-status" "$WORK/rootfs/usr/local/bin/cogos-shell" "$WORK/rootfs/usr/local/bin/cogos-doctor" "$WORK/rootfs/usr/local/bin/cogos-daemon" "$WORK/rootfs/usr/local/bin/cogos-run" "$WORK/rootfs/usr/local/bin/cogos-task" "$WORK/rootfs/usr/local/bin/cogos-trace" "$WORK/rootfs/usr/local/bin/cogos-law" "$WORK/rootfs/usr/local/bin/cogos-admit" "$WORK/rootfs/usr/local/bin/cogos-snapshot" "$WORK/rootfs/usr/local/bin/cogos-reflect" "$WORK/rootfs/usr/local/bin/cogos-dashboard" "$WORK/rootfs/usr/local/bin/cogos-dashboard-start" "$WORK/rootfs/usr/local/bin/cogos-dashboard-stop" "$WORK/rootfs/usr/local/bin/cogos-desktop-hint" "$WORK/rootfs/usr/local/bin/cogos-verify-trace" "$WORK/rootfs/usr/local/bin/cogos-governance-test" "$WORK/rootfs/usr/local/bin/cogos-module" "$WORK/rootfs/usr/local/bin/cogos-traits" "$WORK/rootfs/usr/local/bin/cogos-patterns" "$WORK/rootfs/usr/local/bin/cogos-proof" "$WORK/rootfs/usr/local/bin/cogos-operator" "$WORK/rootfs/usr/local/bin/cogos-perf" "$WORK/rootfs/usr/local/bin/cogos-pid1-proof" "$WORK/rootfs/usr/local/bin/cogos-ul" "$WORK/rootfs/usr/local/bin/cogos-voss"
 chmod +x "$WORK/rootfs/opt/cogos/modules/local/trace_analyzer/trace_analyzer.py" "$WORK/rootfs/opt/cogos/modules/local/bad_mutator/bad_mutator.py" "$WORK/rootfs/opt/cogos/modules/local/invalid_output/invalid_output.py" "$WORK/rootfs/opt/cogos/modules/local/slow_module/slow_module.py"
 
 NATIVE_INIT_REAL="$(readlink -f "$WORK/rootfs/usr/sbin/init" 2>/dev/null || true)"

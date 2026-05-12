@@ -2,7 +2,7 @@
 
 ## Boot Flow
 
-1. Boot the v11 ISO in Hyper-V.
+1. Boot the v12 ISO in Hyper-V.
 2. Wait for Puppy/Trixie to finish loading.
 3. Open a terminal.
 4. Run `cogos-pid1-proof` to confirm the PID 1 gate passed.
@@ -87,6 +87,35 @@ cogos-proof
 
 If PID 1 verification fails, v11 fails closed into maintenance shell instead of
 starting native init.
+
+## V12 UL/VOSS Governed Runtime
+
+v12 adds the Universal Language and VOSS execution core as local governed
+runtime surfaces. The v11 PID 1 boot chain is unchanged.
+
+Known-good v12 sequence:
+
+```sh
+cogos-ul trace /opt/cogos/examples/ul/hello.ul
+cogos-ul substrate /opt/cogos/examples/ul/safe_substrate.ulsub
+cogos-voss run-golden
+cogos-voss verify-golden
+cogos-voss validate
+cogos-voss binding-demo
+cogos-voss proof
+cogos-proof
+```
+
+Adversarial substrate checks:
+
+```sh
+cogos-ul substrate /opt/cogos/examples/ul/dangerous_substrate.ulsub
+cogos-ul substrate /opt/cogos/examples/ul/oversized_substrate.ulsub
+```
+
+Both should fail closed and write audit evidence under
+`/opt/cogos/memory/ul/substrate_audit.jsonl`. VOSS proof records are stored
+under `/opt/cogos/memory/voss/`.
 
 From Windows, tune an existing Hyper-V VM with fixed 6GB memory and 4 CPUs:
 
@@ -220,7 +249,8 @@ The dashboard shows daemon health, law decisions, module registry, trait ledger,
 trace verification, sandbox status, recent module runs, sandbox denials,
 identity state, drift score, trait warnings, quarantined modules, snapshots,
 reflections, Pattern Ledger, Hall of Fame, Hall of Shame, immune recommendations,
-guidance candidates, boot profile, performance status, and recovery hints.
+guidance candidates, UL/VOSS runtime proof, boot profile, performance status,
+and recovery hints.
 
 ```text
 cogos-dashboard-start

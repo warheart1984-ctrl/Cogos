@@ -16,8 +16,8 @@
                   },
                   {
                       "path":  "/opt/cogos/law/governance_rules.json",
-                      "sha256":  "d668a13bd14c748783db0098a6e2f98870fe76be6d3fbbb1012f0c081e9b5865",
-                      "bytes":  4399
+                      "sha256":  "1648a6099851f3b9a8425f8b71663f414f615b16e9722adbe7dc1c722aaee621",
+                      "bytes":  5741
                   }
               ]
 }

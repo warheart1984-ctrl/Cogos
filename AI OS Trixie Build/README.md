@@ -16,10 +16,9 @@ It follows the clean AAIS and ARIS planning docs:
 
 - `payload/opt/cogos/bin/cognitive_init`: PID 1 entrypoint for the prototype.
 - `payload/opt/cogos/bin/cogos_boot.py`: governed boot verification harness.
-- `payload/opt/cogos/bin/cogos_operator_boot.py`: v10 fast operator surface.
+- `payload/opt/cogos/bin/cogos_operator_boot.py`: v12 fast operator surface.
 - `payload/opt/cogos/bin/cogos_shell`: minimal operator shell.
-- `payload/opt/cogos/runtime`: current AAIS/ARIS runtime files from this
-  workspace.
+- `payload/opt/cogos/runtime`: AAIS/ARIS runtime plus v12 UL/VOSS runtimes.
 - `payload/opt/cogos/law`: root law, boot law, governance rules, and the clean
   planning docs.
 - `scripts/build_trixie_cogos.sh`: Linux remaster script.
@@ -51,12 +50,12 @@ sudo COGOS_WORK=/tmp/project-infi-cogos-build bash scripts/build_trixie_cogos.sh
 Expected output:
 
 ```text
-output/project-infi-aris-trixie-full-os-v11.iso
+output/project-infi-aris-trixie-full-os-v12.iso
 ```
 
 ## Boot Behavior
 
-v11 installs `/opt/cogos/bin/cognitive_init` as the real PID 1 gatekeeper.
+v12 preserves the v11 `/opt/cogos/bin/cognitive_init` PID 1 gatekeeper.
 The original Puppy/Trixie init is preserved as `/usr/sbin/init.original`.
 
 On boot:
@@ -107,6 +106,13 @@ cogos-patterns shame
 cogos-patterns immune
 cogos-patterns guidance
 cogos-patterns prove
+cogos-ul trace /opt/cogos/examples/ul/hello.ul
+cogos-ul substrate /opt/cogos/examples/ul/safe_substrate.ulsub
+cogos-voss run-golden
+cogos-voss verify-golden
+cogos-voss validate
+cogos-voss binding-demo
+cogos-voss proof
 cogos-module admit /opt/cogos/modules/local/bad_mutator
 cogos-module admit /opt/cogos/modules/local/invalid_output
 cogos-module run invalid_output
@@ -142,6 +148,10 @@ Fame, Shame, immune recommendations, and guidance candidates under
 v10 adds Fast Operator Boot. v11 adds the true PID 1 gatekeeper: boot proof and
 daemon startup happen before native init handoff, while dashboard and heavier
 desktop work remain operator choice.
+
+v12 adds UL/VOSS Governed Runtime. UL language runs, UL substrate dispatch, VOSS
+binary golden-path verification, VOSS validation, and VOSS binding proof are
+available as local governed runtime surfaces and appear in `cogos-proof`.
 
 ## Safety Notes
 

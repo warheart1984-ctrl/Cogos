@@ -35,7 +35,13 @@
         "trace.read",
         "snapshot.create",
         "reflection.submit",
-        "module.execute"
+        "module.execute",
+        "ul.run",
+        "ul.trace",
+        "ul.substrate.execute",
+        "voss.run",
+        "voss.verify",
+        "voss.bind"
       ]
     },
     "developer": {
@@ -52,6 +58,7 @@
       "capabilities": [
         "law.read",
         "memory.read",
+        "memory.append",
         "trace.read",
         "module.inspect",
         "module.verify",
@@ -60,7 +67,9 @@
         "pattern.classify",
         "immune.recommend",
         "guidance.promote",
-        "reflection.review"
+        "reflection.review",
+        "ul.trace",
+        "voss.verify"
       ]
     },
     "restricted-runtime": {
@@ -194,6 +203,70 @@
       ],
       "requires": [
         "evidence"
+      ]
+    },
+    {
+      "rule": "ul.run",
+      "requires_capabilities": [
+        "ul.run",
+        "memory.append"
+      ],
+      "requires": [
+        "source"
+      ]
+    },
+    {
+      "rule": "ul.trace",
+      "requires_capabilities": [
+        "ul.trace",
+        "memory.append"
+      ],
+      "requires": [
+        "source"
+      ]
+    },
+    {
+      "rule": "ul.substrate.execute",
+      "requires_capabilities": [
+        "ul.substrate.execute",
+        "memory.append"
+      ],
+      "requires": [
+        "source"
+      ],
+      "denies": [
+        "dangerous_substrate",
+        "privileged_substrate"
+      ]
+    },
+    {
+      "rule": "voss.run",
+      "requires_capabilities": [
+        "voss.run",
+        "memory.append"
+      ],
+      "requires": [
+        "runtime"
+      ]
+    },
+    {
+      "rule": "voss.verify",
+      "requires_capabilities": [
+        "voss.verify",
+        "memory.append"
+      ],
+      "requires": [
+        "runtime"
+      ]
+    },
+    {
+      "rule": "voss.bind",
+      "requires_capabilities": [
+        "voss.bind",
+        "memory.append"
+      ],
+      "requires": [
+        "runtime"
       ]
     },
     {
