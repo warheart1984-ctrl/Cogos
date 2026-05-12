@@ -1,0 +1,25 @@
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+.forge_chat/
+.runtime/
+build/
+dist/
+release/
+.vscode/
+Code/
+*.code-workspace
+*.err.log
+*.out.log
+*.egg-info/
+*.db
+*.log
+results/
+
+# CoGOS release artifacts
+AI OS Trixie Build/output/*.iso
+AI OS Trixie Build/output/*.img
+AI OS Trixie Build/work/
+AI OS Trixie Build/**/__pycache__/
