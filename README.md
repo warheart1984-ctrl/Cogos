@@ -1,3 +1,7 @@
+https://zenodo.org/records/20129242
+AAIS: A Conceptual Architecture for Governed Cognitive Systems
+
+
 # CoGOS
 
 CoGOS is the Project Infi / ARIS governed runtime layer for a Puppy/Trixie
