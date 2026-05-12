@@ -1,12 +1,20 @@
 param(
   [string]$VmName = "Project-Infi-ARIS-Trixie-CoGOS",
-  [string]$IsoPath = "E:\project-infi\AI OS Trixie Build\output\project-infi-aris-trixie-full-os-v10.iso",
+  [string]$IsoPath = "E:\project-infi\AI OS Trixie Build\output\project-infi-aris-trixie-full-os-v11.iso",
   [string]$StatusPath = "E:\project-infi\AI OS Trixie Build\output\hyperv-full-os-status.txt",
-  [int64]$MemoryStartupBytes = 6GB,
+  [string]$MemoryStartupBytes = "6GB",
   [int]$ProcessorCount = 4
 )
 
 $ErrorActionPreference = "Stop"
+
+function Convert-MemorySize {
+  param([string]$Value)
+  if ($Value -match '^\s*(\d+)\s*GB\s*$') { return [int64]$matches[1] * 1GB }
+  if ($Value -match '^\s*(\d+)\s*MB\s*$') { return [int64]$matches[1] * 1MB }
+  if ($Value -match '^\s*\d+\s*$') { return [int64]$Value }
+  throw "Invalid memory size: $Value. Use bytes, MB, or GB, for example 2147483648, 2048MB, or 2GB."
+}
 
 try {
   Import-Module Hyper-V
@@ -26,8 +34,9 @@ try {
     Set-VMDvdDrive -VMName $VmName -Path $IsoPath | Out-Null
   }
 
+  $memoryBytes = Convert-MemorySize $MemoryStartupBytes
   Set-VMProcessor -VMName $VmName -Count $ProcessorCount | Out-Null
-  Set-VMMemory -VMName $VmName -DynamicMemoryEnabled $false -StartupBytes $MemoryStartupBytes | Out-Null
+  Set-VMMemory -VMName $VmName -DynamicMemoryEnabled $false -StartupBytes $memoryBytes | Out-Null
 
   Start-VM -Name $VmName
   Start-Process vmconnect.exe -ArgumentList "localhost", $VmName

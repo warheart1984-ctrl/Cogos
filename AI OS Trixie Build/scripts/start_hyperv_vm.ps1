@@ -1,13 +1,21 @@
 param(
   [string]$VmName = "Project-Infi-ARIS-Trixie-CoGOS",
-  [string]$IsoPath = "E:\project-infi\AI OS Trixie Build\output\project-infi-aris-trixie-full-os-v10.iso",
-  [int64]$MemoryStartupBytes = 6GB,
+  [string]$IsoPath = "E:\project-infi\AI OS Trixie Build\output\project-infi-aris-trixie-full-os-v11.iso",
+  [string]$MemoryStartupBytes = "6GB",
   [int]$ProcessorCount = 4,
   [int64]$DiskSizeBytes = 20GB,
   [string]$VmRoot = "$env:PUBLIC\Documents\Hyper-V\Project-Infi"
 )
 
 $ErrorActionPreference = "Stop"
+
+function Convert-MemorySize {
+  param([string]$Value)
+  if ($Value -match '^\s*(\d+)\s*GB\s*$') { return [int64]$matches[1] * 1GB }
+  if ($Value -match '^\s*(\d+)\s*MB\s*$') { return [int64]$matches[1] * 1MB }
+  if ($Value -match '^\s*\d+\s*$') { return [int64]$Value }
+  throw "Invalid memory size: $Value. Use bytes, MB, or GB, for example 2147483648, 2048MB, or 2GB."
+}
 
 function Assert-Administrator {
   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -31,7 +39,8 @@ New-Item -ItemType Directory -Force -Path $vmPath | Out-Null
 
 $existing = Get-VM -Name $VmName -ErrorAction SilentlyContinue
 if (-not $existing) {
-  New-VM -Name $VmName -Generation 1 -MemoryStartupBytes $MemoryStartupBytes -Path $VmRoot -NoVHD | Out-Null
+  $memoryBytes = Convert-MemorySize $MemoryStartupBytes
+  New-VM -Name $VmName -Generation 1 -MemoryStartupBytes $memoryBytes -Path $VmRoot -NoVHD | Out-Null
   New-VHD -Path $vhdPath -SizeBytes $DiskSizeBytes -Dynamic | Out-Null
   Add-VMHardDiskDrive -VMName $VmName -Path $vhdPath | Out-Null
   Add-VMDvdDrive -VMName $VmName -Path $IsoPath | Out-Null
@@ -43,8 +52,9 @@ if (-not $existing) {
   }
 }
 
+$memoryBytes = Convert-MemorySize $MemoryStartupBytes
 Set-VMProcessor -VMName $VmName -Count $ProcessorCount | Out-Null
-Set-VMMemory -VMName $VmName -DynamicMemoryEnabled $false -StartupBytes $MemoryStartupBytes | Out-Null
+Set-VMMemory -VMName $VmName -DynamicMemoryEnabled $false -StartupBytes $memoryBytes | Out-Null
 Set-VMFirmware -VMName $VmName -EnableSecureBoot Off -ErrorAction SilentlyContinue | Out-Null
 
 $dvd = Get-VMDvdDrive -VMName $VmName

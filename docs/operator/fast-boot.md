@@ -1,27 +1,8 @@
-# CoGOS v10 Fast Operator Boot
+# CoGOS v11 Fast Operator Boot And PID 1 Gate
 
-v10 makes CoGOS feel usable first, then visual when needed. The default boot
-profile starts the governed runtime and daemon, but defers the dashboard so the
-Hyper-V VM is not paying for a web UI during every boot.
-
-## Actual Init Model
-
-In the full v10 ISO, CoGOS does not replace PID 1. Puppy/Trixie keeps native
-init ownership, and CoGOS starts through `/etc/init.d/90cogos`.
-
-That means:
-
-- PID 1 is native Puppy/Trixie init.
-- `90cogos` is the startup hook for CoGOS.
-- `cogos_boot.py --boot` performs post-native-init boot verification.
-- `cogos_daemon.py --daemon` owns the persistent governed runtime process.
-- `aris_runtime.py` is runtime code, not the init process.
-- `cognitive_init` is present as a prototype PID 1 entrypoint, but is not used
-  by this full OS build.
-
-v10 enforcement is runtime-scoped: CoGOS commands and module execution route
-through law, trait, sandbox, pattern, and proof checks. It is not yet
-kernel-level pre-process enforcement.
+v11 keeps the fast operator behavior from v10, but moves CoGOS earlier in the
+boot chain. The kernel starts `cognitive_init` as PID 1, CoGOS verifies law and
+runtime integrity, starts the governed daemon, then hands off to native init.
 
 ## Boot Profile
 
@@ -64,8 +45,8 @@ cogos-dashboard-stop
 
 ## Desktop
 
-Puppy/Trixie desktop is still available. CoGOS v10 simply treats the operator
-shell as the preferred first surface.
+Puppy/Trixie desktop is still available. CoGOS v11 gates boot first, then
+treats the operator shell as the preferred first surface.
 
 ```sh
 cogos-desktop-hint
@@ -73,7 +54,7 @@ cogos-desktop-hint
 
 ## Hyper-V Defaults
 
-The v10 helper scripts use:
+The v11 helper scripts use:
 
 - 4 virtual CPUs
 - fixed 6GB startup memory
@@ -87,7 +68,7 @@ powershell -ExecutionPolicy Bypass -File "E:\project-infi\AI OS Trixie Build\scr
 
 ## Governance
 
-Governance stack unchanged from v9:
+Governance stack remains available after PID 1 handoff:
 
 - Law Engine
 - Sandboxed module execution
@@ -96,3 +77,11 @@ Governance stack unchanged from v9:
 - Immune recommendations
 - `cogos-proof`
 
+## PID 1 Proof
+
+```sh
+cogos-pid1-proof
+cogos-proof
+```
+
+`cogos-proof` includes `pid1_gate_ok`.

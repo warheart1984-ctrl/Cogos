@@ -1,11 +1,19 @@
 param(
   [string]$VmName = "Project-Infi-ARIS-Trixie-CoGOS",
-  [int64]$MemoryStartupBytes = 6GB,
+  [string]$MemoryStartupBytes = "6GB",
   [int]$ProcessorCount = 4,
-  [string]$StatusPath = "E:\project-infi\AI OS Trixie Build\output\hyperv-v10-tune-status.txt"
+  [string]$StatusPath = "E:\project-infi\AI OS Trixie Build\output\hyperv-v11-tune-status.txt"
 )
 
 $ErrorActionPreference = "Stop"
+
+function Convert-MemorySize {
+  param([string]$Value)
+  if ($Value -match '^\s*(\d+)\s*GB\s*$') { return [int64]$matches[1] * 1GB }
+  if ($Value -match '^\s*(\d+)\s*MB\s*$') { return [int64]$matches[1] * 1MB }
+  if ($Value -match '^\s*\d+\s*$') { return [int64]$Value }
+  throw "Invalid memory size: $Value. Use bytes, MB, or GB, for example 2147483648, 2048MB, or 2GB."
+}
 
 function Assert-Administrator {
   $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -25,8 +33,9 @@ if ($wasRunning) {
   Stop-VM -Name $VmName -TurnOff -Force
 }
 
+$memoryBytes = Convert-MemorySize $MemoryStartupBytes
 Set-VMProcessor -VMName $VmName -Count $ProcessorCount | Out-Null
-Set-VMMemory -VMName $VmName -DynamicMemoryEnabled $false -StartupBytes $MemoryStartupBytes | Out-Null
+Set-VMMemory -VMName $VmName -DynamicMemoryEnabled $false -StartupBytes $memoryBytes | Out-Null
 
 if ($wasRunning) {
   Start-VM -Name $VmName | Out-Null

@@ -23,7 +23,8 @@ echo "  module-run ID - run admitted module through sandbox"
 echo "  traits      - list trait identity state"
 echo "  patterns    - list Pattern Ledger entries"
 echo "  proof        - run known-good proof summary"
-echo "  operator     - show fast v10 operator surface"
+echo "  operator     - show fast v11 operator surface"
+echo "  pid1-proof   - show PID 1 gate proof"
 echo "  perf         - show VM/runtime performance"
 echo "  dashboard    - print dashboard URL"
 echo "  dash-start   - start dashboard on demand"
@@ -91,6 +92,9 @@ while true; do
       ;;
     operator)
       cogos-operator
+      ;;
+    pid1-proof)
+      cogos-pid1-proof
       ;;
     perf)
       cogos-perf

@@ -5,8 +5,14 @@ echo
 echo "== CoGOS status =="
 cogos-status 2>&1
 echo
+echo "== CoGOS PID 1 proof =="
+cogos-pid1-proof 2>&1
+echo
 echo "== CoGOS service log =="
 cat /var/log/cogos-service.log 2>&1
+echo
+echo "== CoGOS PID 1 log =="
+cat /var/log/cogos-pid1.log 2>&1
 echo
 echo "== CoGOS daemon =="
 cogos-daemon --status 2>&1

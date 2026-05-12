@@ -7,7 +7,7 @@ Usage:
   bash scripts/build_trixie_cogos.sh /path/to/TrixiePup64-Wayland-2601-260502.iso
 
 Output:
-  output/project-infi-aris-trixie-full-os-v10.iso
+  output/project-infi-aris-trixie-full-os-v11.iso
 
 Required Linux tools:
   unsquashfs mksquashfs xorriso rsync
@@ -22,7 +22,7 @@ fi
 ISO="$(readlink -f "$1")"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK="${COGOS_WORK:-$ROOT/work}"
-OUT="${COGOS_OUT:-$ROOT/output/project-infi-aris-trixie-full-os-v10.iso}"
+OUT="${COGOS_OUT:-$ROOT/output/project-infi-aris-trixie-full-os-v11.iso}"
 PAYLOAD="$ROOT/payload"
 
 for tool in unsquashfs mksquashfs xorriso rsync find; do
@@ -61,18 +61,41 @@ echo "[5/8] Stage Project Infi / ARIS payload"
 rsync -aH "$PAYLOAD/" "$WORK/rootfs/"
 chmod +x "$WORK/rootfs/opt/cogos/bin/cognitive_init" "$WORK/rootfs/opt/cogos/bin/cogos_shell" "$WORK/rootfs/opt/cogos/bin/cogos_boot.py" "$WORK/rootfs/opt/cogos/bin/cogos_daemon.py" "$WORK/rootfs/opt/cogos/bin/cogos_dashboard.py" "$WORK/rootfs/opt/cogos/bin/cogos_operator_boot.py"
 
-echo "[6/8] Preserve native init and install CoGOS startup layer"
-chmod +x "$WORK/rootfs/etc/init.d/90cogos" "$WORK/rootfs/usr/local/bin/cogos-status" "$WORK/rootfs/usr/local/bin/cogos-shell" "$WORK/rootfs/usr/local/bin/cogos-doctor" "$WORK/rootfs/usr/local/bin/cogos-daemon" "$WORK/rootfs/usr/local/bin/cogos-run" "$WORK/rootfs/usr/local/bin/cogos-task" "$WORK/rootfs/usr/local/bin/cogos-trace" "$WORK/rootfs/usr/local/bin/cogos-law" "$WORK/rootfs/usr/local/bin/cogos-admit" "$WORK/rootfs/usr/local/bin/cogos-snapshot" "$WORK/rootfs/usr/local/bin/cogos-reflect" "$WORK/rootfs/usr/local/bin/cogos-dashboard" "$WORK/rootfs/usr/local/bin/cogos-dashboard-start" "$WORK/rootfs/usr/local/bin/cogos-dashboard-stop" "$WORK/rootfs/usr/local/bin/cogos-desktop-hint" "$WORK/rootfs/usr/local/bin/cogos-verify-trace" "$WORK/rootfs/usr/local/bin/cogos-governance-test" "$WORK/rootfs/usr/local/bin/cogos-module" "$WORK/rootfs/usr/local/bin/cogos-traits" "$WORK/rootfs/usr/local/bin/cogos-patterns" "$WORK/rootfs/usr/local/bin/cogos-proof" "$WORK/rootfs/usr/local/bin/cogos-operator" "$WORK/rootfs/usr/local/bin/cogos-perf"
+echo "[6/8] Install CoGOS PID 1 gatekeeper and startup layer"
+chmod +x "$WORK/rootfs/etc/init.d/90cogos" "$WORK/rootfs/usr/local/bin/cogos-status" "$WORK/rootfs/usr/local/bin/cogos-shell" "$WORK/rootfs/usr/local/bin/cogos-doctor" "$WORK/rootfs/usr/local/bin/cogos-daemon" "$WORK/rootfs/usr/local/bin/cogos-run" "$WORK/rootfs/usr/local/bin/cogos-task" "$WORK/rootfs/usr/local/bin/cogos-trace" "$WORK/rootfs/usr/local/bin/cogos-law" "$WORK/rootfs/usr/local/bin/cogos-admit" "$WORK/rootfs/usr/local/bin/cogos-snapshot" "$WORK/rootfs/usr/local/bin/cogos-reflect" "$WORK/rootfs/usr/local/bin/cogos-dashboard" "$WORK/rootfs/usr/local/bin/cogos-dashboard-start" "$WORK/rootfs/usr/local/bin/cogos-dashboard-stop" "$WORK/rootfs/usr/local/bin/cogos-desktop-hint" "$WORK/rootfs/usr/local/bin/cogos-verify-trace" "$WORK/rootfs/usr/local/bin/cogos-governance-test" "$WORK/rootfs/usr/local/bin/cogos-module" "$WORK/rootfs/usr/local/bin/cogos-traits" "$WORK/rootfs/usr/local/bin/cogos-patterns" "$WORK/rootfs/usr/local/bin/cogos-proof" "$WORK/rootfs/usr/local/bin/cogos-operator" "$WORK/rootfs/usr/local/bin/cogos-perf" "$WORK/rootfs/usr/local/bin/cogos-pid1-proof"
 chmod +x "$WORK/rootfs/opt/cogos/modules/local/trace_analyzer/trace_analyzer.py" "$WORK/rootfs/opt/cogos/modules/local/bad_mutator/bad_mutator.py" "$WORK/rootfs/opt/cogos/modules/local/invalid_output/invalid_output.py" "$WORK/rootfs/opt/cogos/modules/local/slow_module/slow_module.py"
-if [[ -L "$WORK/rootfs/usr/sbin/init" && "$(readlink "$WORK/rootfs/usr/sbin/init")" == "/opt/cogos/bin/cognitive_init" ]]; then
-  if [[ -e "$WORK/rootfs/usr/sbin/init.original" ]]; then
-    rm "$WORK/rootfs/usr/sbin/init"
-    mv "$WORK/rootfs/usr/sbin/init.original" "$WORK/rootfs/usr/sbin/init"
-  else
-    echo "Native init was replaced but no init.original exists." >&2
-    exit 5
-  fi
+
+NATIVE_INIT_REAL="$(readlink -f "$WORK/rootfs/usr/sbin/init" 2>/dev/null || true)"
+if [[ -z "$NATIVE_INIT_REAL" || ! -e "$NATIVE_INIT_REAL" ]]; then
+  NATIVE_INIT_REAL="$(readlink -f "$WORK/rootfs/sbin/init" 2>/dev/null || true)"
 fi
+if [[ -z "$NATIVE_INIT_REAL" || ! -e "$NATIVE_INIT_REAL" ]]; then
+  echo "Native init not found at /usr/sbin/init or /sbin/init." >&2
+  exit 5
+fi
+if [[ "$NATIVE_INIT_REAL" == "$WORK/rootfs/opt/cogos/bin/cognitive_init" ]]; then
+  echo "Native init already points to CoGOS before preservation." >&2
+  exit 5
+fi
+if [[ ! -e "$WORK/rootfs/usr/sbin/init.original" ]]; then
+  cp -a "$NATIVE_INIT_REAL" "$WORK/rootfs/usr/sbin/init.original"
+fi
+chmod +x "$WORK/rootfs/usr/sbin/init.original"
+rm -f "$WORK/rootfs/usr/sbin/init"
+ln -s /opt/cogos/bin/cognitive_init "$WORK/rootfs/usr/sbin/init"
+if [[ -e "$WORK/rootfs/sbin" && ! -L "$WORK/rootfs/sbin" ]]; then
+  rm -f "$WORK/rootfs/sbin/init"
+  ln -s /opt/cogos/bin/cognitive_init "$WORK/rootfs/sbin/init"
+fi
+[[ "$(readlink "$WORK/rootfs/usr/sbin/init")" == "/opt/cogos/bin/cognitive_init" ]] || {
+  echo "/usr/sbin/init does not resolve to CoGOS cognitive_init." >&2
+  exit 5
+}
+[[ "$(readlink "$WORK/rootfs/sbin/init")" == "/opt/cogos/bin/cognitive_init" ]] || {
+  echo "/sbin/init does not resolve to CoGOS cognitive_init." >&2
+  exit 5
+}
+echo "Preserved native init: /usr/sbin/init.original from ${NATIVE_INIT_REAL#$WORK/rootfs}"
 
 echo "[7/8] Rebuild SquashFS"
 mksquashfs "$WORK/rootfs" "$SFS_SOURCE" -comp xz -b 1M -noappend -all-root

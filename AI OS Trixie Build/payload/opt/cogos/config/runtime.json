@@ -1,6 +1,6 @@
 {
   "name": "Project Infi / ARIS Cognitive OS Runtime",
-  "version": "0.1",
+  "version": "0.11",
   "root": "/opt/cogos",
   "paths": {
     "runtime": "/opt/cogos/runtime",
@@ -14,6 +14,9 @@
   },
   "boot": {
     "entrypoint": "/opt/cogos/bin/cognitive_init",
+    "mode": "pid1_gatekeeper",
+    "native_handoff": "/usr/sbin/init.original",
+    "pid1_proof": "/opt/cogos/memory/logs/pid1_proof.json",
     "shell": "/opt/cogos/bin/cogos_shell",
     "report": "/opt/cogos/memory/logs/boot_report.json",
     "profile": "/opt/cogos/config/boot_profile.json"

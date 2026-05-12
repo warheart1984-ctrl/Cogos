@@ -46,6 +46,7 @@ MANIFEST = ROOT / "config" / "module_manifest.json"
 RUNTIME_CONFIG = ROOT / "config" / "runtime.json"
 STATE_PATH = RUN / "cogos-daemon.json"
 PID_PATH = RUN / "cogos-daemon.pid"
+PID1_PROOF = LOGS / "pid1_proof.json"
 STOP = False
 
 
@@ -1374,9 +1375,19 @@ def proof_report() -> int:
     shame_ids = {row.get("pattern_id") for row in shame}
     law_11_ok = all(row.get("pattern_id") in shame_ids for row in verified_failures)
     pattern_ledger_ok = law_11_ok
+    pid1_proof = {}
+    pid1_gate_ok = False
+    try:
+        pid1_proof = load_json(PID1_PROOF)
+        pid1_gate_ok = bool(pid1_proof.get("pid1_gate_ok")) and pid1_proof.get("pid") == 1
+    except Exception:
+        pid1_proof = {"missing": str(PID1_PROOF)}
+        pid1_gate_ok = False
     report = {
         "timestamp": now(),
         "law_integrity": law_ok,
+        "pid1_gate_ok": pid1_gate_ok,
+        "pid1_proof": pid1_proof,
         "registry_integrity": registry_ok,
         "latest_trace_hash": trace_ok,
         "latest_module_execution_deterministic": module_execution_ok,
@@ -1396,7 +1407,7 @@ def proof_report() -> int:
         "module_count": len(registry.get("modules", {})),
         "active_modules": sorted([mid for mid, rec in registry.get("modules", {}).items() if rec.get("status") == "active"]),
         "heartbeat": heartbeat(),
-        "ok": law_ok and registry_ok and (trace_ok or not cycles) and module_execution_ok and trait_identity_ok and pattern_ledger_ok,
+        "ok": law_ok and pid1_gate_ok and registry_ok and (trace_ok or not cycles) and module_execution_ok and trait_identity_ok and pattern_ledger_ok,
     }
     print(json.dumps(report, indent=2, sort_keys=True))
     append_jsonl(TRACES / "proof.jsonl", report)

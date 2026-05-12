@@ -51,37 +51,29 @@ sudo COGOS_WORK=/tmp/project-infi-cogos-build bash scripts/build_trixie_cogos.sh
 Expected output:
 
 ```text
-output/project-infi-aris-trixie-full-os-v10.iso
+output/project-infi-aris-trixie-full-os-v11.iso
 ```
 
 ## Boot Behavior
 
-The full OS build preserves the original TrixiePup init path and installs
-Project Infi / ARIS as a normal startup layer through `/etc/init.d/90cogos`.
-The prototype `/opt/cogos/bin/cognitive_init` remains available in the image,
-but it is not used as PID 1 by the full OS build.
-
-`aris_runtime.py` is staged runtime code, not the init process. In v10, the
-persistent CoGOS process is `cogos_daemon.py --daemon`, launched by `90cogos`
-after native Puppy/Trixie init has started the service layer.
-
-Law enforcement is runtime-scoped. CoGOS-governed actions route through the law
-engine, but native OS processes are not blocked by a pre-process CoGOS kernel
-gate in this release.
+v11 installs `/opt/cogos/bin/cognitive_init` as the real PID 1 gatekeeper.
+The original Puppy/Trixie init is preserved as `/usr/sbin/init.original`.
 
 On boot:
 
-1. TrixiePup boots normally through its native init and service scripts.
-2. `/etc/init.d/90cogos` starts after the base OS services.
-3. CoGOS reads `/opt/cogos/config/boot_profile.json`.
-4. CoGOS launches boot verification and the daemon in fast operator mode.
-5. CoGOS defers the dashboard unless `dashboard_autostart` is enabled.
-6. CoGOS writes `/opt/cogos/memory/logs/boot_report.json`.
+1. Kernel starts `/opt/cogos/bin/cognitive_init` as PID 1.
+2. CoGOS mounts minimal runtime surfaces.
+3. CoGOS verifies root law and staged runtime payload.
+4. CoGOS starts `cogos_daemon.py --daemon`.
+5. CoGOS writes `/opt/cogos/memory/logs/pid1_proof.json`.
+6. PID 1 execs `/usr/sbin/init.original`.
+7. Native Puppy/Trixie boot continues; dashboard remains on-demand.
 
 Inside the running OS, use:
 
 ```sh
 cogos-status
+cogos-pid1-proof
 cogos-operator
 cogos-perf
 cogos-shell
@@ -147,10 +139,9 @@ v9 adds Pattern Ledger + Immune Runtime. Runtime evidence is classified into
 Fame, Shame, immune recommendations, and guidance candidates under
 `/opt/cogos/memory/patterns`.
 
-v10 adds Fast Operator Boot. The default path is `operator_shell`: boot proof
-and daemon are started, while dashboard and heavier desktop work are operator
-choice. Hyper-V helper scripts now target the v10 ISO with 4 CPUs and fixed
-6GB startup memory.
+v10 adds Fast Operator Boot. v11 adds the true PID 1 gatekeeper: boot proof and
+daemon startup happen before native init handoff, while dashboard and heavier
+desktop work remain operator choice.
 
 ## Safety Notes
 

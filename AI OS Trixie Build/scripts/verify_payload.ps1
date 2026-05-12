@@ -31,6 +31,7 @@ $required = @(
   "..\..\usr\local\bin\cogos-proof",
   "..\..\usr\local\bin\cogos-operator",
   "..\..\usr\local\bin\cogos-perf",
+  "..\..\usr\local\bin\cogos-pid1-proof",
   "law\root_law.json",
   "law\boot_law.json",
   "law\governance_rules.json",

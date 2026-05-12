@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast operator boot surface for CoGOS v10."""
+"""Fast operator boot surface for CoGOS v11."""
 
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ def main() -> int:
     daemon_running = pid_running(DAEMON_PID)
     dashboard_running = pid_running(DASHBOARD_PID)
 
-    print("Project Infi / CoGOS v10 Fast Operator Boot")
+    print("Project Infi / CoGOS v11 Fast Operator Boot")
     print("=" * 46)
     line("profile", profile.get("profile", "unknown"))
     line("message", profile.get("operator_message", ""))

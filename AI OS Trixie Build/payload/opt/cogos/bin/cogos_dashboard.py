@@ -141,7 +141,8 @@ def dashboard_data():
         "law_integrity": read_jsonl(TRACES / "law_integrity.jsonl", 5),
         "recovery_hints": [
             "Run cogos-doctor for a full local diagnosis.",
-            "Run cogos-operator for the fast v10 operator surface.",
+            "Run cogos-operator for the fast v11 operator surface.",
+            "Run cogos-pid1-proof to inspect the PID 1 gate record.",
             "Run cogos-perf to inspect VM pressure and dashboard state.",
             "Run cogos-dashboard-start only when you need the web UI.",
             "Run cogos-dashboard-stop if Puppy becomes laggy.",
