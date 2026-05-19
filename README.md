@@ -1,217 +1,156 @@
-# ARIS — Law-Governed Execution System
+# CoGOS - Project Infi Cognitive OS
 
-ARIS is not a chatbot.
+CoGOS is the Project Infi / ARIS governed cognitive OS image.
 
-It is a law-governed execution system that **does not guess intent**.
-It derives, verifies, and executes under constraint.
+It remasters Debian Live into a bootable operator system with a law-gated
+runtime, Nova operator surface, UL substrate, signed manifests, recovery mode,
+safe storage controls, and a real installer path.
 
----
+## Current Release
 
-## 🚀 Start Here (30 seconds)
+**Release:** `12.10.1-hardware-boot`
 
-ARIS is currently distributed as **source** while runtime builds are being stabilized.
+This release fixes the real-hardware boot freeze risk by making the PID1
+governance gate fast and hardware-safe:
 
-Run locally:
+- PID1 performs a bounded law/proof check.
+- Long-running HAL, determinism, daemon, and UI work is deferred to init.
+- Native Debian init receives control quickly.
+- Kernel bypass flags are available for target-laptop recovery.
+
+Local ISO:
+
+```text
+AI OS Debian Build/output/project-infi-cogos-12.10.1-hardware-boot.iso
+```
+
+SHA256:
+
+```text
+ada0e437802c4f79ef7d77eeda09d8243d4f087923922c6caf78bcbc88ff2671
+```
+
+The ISO binary is not stored in Git because it is about 3.9 GB. The checksum
+and source payload are tracked so the image can be verified and rebuilt.
+
+## What Is Included
+
+- Governed PID1 boot gate with native Debian handoff
+- CoGOS runtime spine: GRE, Nova, UL, VOSS, Pattern Ledger
+- CoGOS Control Center
+- First-run wizard
+- Automatic mode for workspaces, file organization, memory, and workflow hints
+- UL stdlib v0.1 with examples
+- Device + Storage Manager MVP
+- Safe mount/unmount path for removable storage
+- Signed release, package, and update manifests
+- Recovery mode: verify, rollback, backup restore, first-run reset
+- Guarded full-disk installer
+- Persistence support
+- Ship preflight and smoke tests
+
+## Hardware Boot Notes
+
+Use the `12.10.1-hardware-boot` ISO for the HP target laptop.
+
+If the laptop freezes at the Debian splash, edit the boot entry and add:
+
+```text
+cogos.safe=1
+```
+
+That bypasses the CoGOS PID1 gate and hands directly to Debian native init.
+If Debian boots with `cogos.safe=1`, the base image and hardware path are good.
+
+For strict fail-closed proof mode:
+
+```text
+cogos.pid1.strict=1
+```
+
+For full early PID1 checks:
+
+```text
+cogos.pid1.full=1
+```
+
+For recovery mode:
+
+```text
+cogos.recovery=1
+```
+
+## Build The ISO
+
+From WSL/Linux:
 
 ```bash
-py -3.12 -m evolving_ai.aris_runtime.desktop
+cd "AI OS Debian Build"
+COGOS_WORK=/tmp/project-infi-cogos-build \
+COGOS_OUT="$PWD/output/project-infi-cogos-12.10.1-hardware-boot.iso" \
+  bash scripts/build_debian_cogos.sh \
+  "/mnt/e/project-infi/debian-live-13.4.0-amd64-cinnamon.iso"
 ```
 
-Then:
+The work directory must be on a Linux filesystem, not an NTFS mount, because
+the Debian ISO contains symlinks and Unix metadata.
 
-* Provide input (text or file)
-* Observe semantic interpretation
-* Review proposed actions
-* Approve execution under law
+## Validate Before Remaster
 
-> Prebuilt binaries (Windows/macOS/Linux) will be added in a future release.
+From Windows PowerShell:
 
----
-
-## 🧠 What ARIS Actually Does
-
-ARIS enforces structure where most systems rely on assumption.
-
-* Input becomes a **SemanticEvent**
-* Actions are **proposed, not assumed**
-* Execution is **blocked unless approved**
-* Every decision carries **identity, audit, and lineage**
-
----
-
-## 🔁 Core Flow
-
-```
-Input (text / file)
-↓
-Semantic Intake (no guessing)
-↓
-Decision Engine
-↓
-Law Gate (approval required)
-↓
-Execution (observable)
-↓
-Evidence + audit trail
+```powershell
+$env:COGOS_ROOT = "E:\project-infi\AI OS Trixie Build\payload\opt\cogos"
+$py = "E:\project-infi\AAIS-main\.runtime\python312-store-copy\python.exe"
+& $py "$env:COGOS_ROOT\bin\cogos_ship.py" preflight
 ```
 
----
+Expected:
 
-## ⚙️ Key Properties
-
-**Canonical Truth**
-One semantic object flows through the entire system
-
-**Observation ≠ Execution**
-ARIS can analyze without acting
-
-**Governance on the Causal Path**
-Nothing executes without passing law
-
-**Fail-Closed Behavior**
-If something breaks, execution stops visibly
-
-**No Demo Shortcuts**
-Archived experiments are isolated from runtime
-
----
-
-## 📄 Example Interaction
-
-**You:**
-
-```
-Add environment controls to this project
+```text
+CoGOS ship preflight: READY_TO_REMASTER
+PASS phase_eval: 15/15
+PASS signed_manifests
 ```
 
-**ARIS:**
-
-```
-Intent: Modify
-System Risk: High
-Actions: analyze → propose → apply → validate
-
-[Approve] [Reject] [Inspect]
-```
-
----
-
-## 📁 Project Structure
-
-```
-/aris_runtime/   → core system (semantic + law + execution)
-/release/        → packaged builds (in progress)
-/docs/           → governance + system documentation
-/LOGBOOK.md      → chronological system evolution
-/SCARS.md        → stability model
-```
-
----
-
-## 🧠 Why This Exists
-
-Most AI systems:
-
-* guess intent
-* execute immediately
-* drift over time
-
-ARIS is built to:
-
-* derive intent structurally
-* enforce decision boundaries
-* remain stable under iteration
-
----
-
-## 📘 Documentation
-
-* Semantic Intake Under Law
-* System Logbook
-* SCARS — Stability Model
-* Voss Binding (governance framework)
-
----
-
-## 🧪 Development
-
-Run locally:
+## Useful Live Commands
 
 ```bash
-py -3.12 -m evolving_ai.aris_runtime.desktop
+cogos-ship preflight
+cogos-pid1-proof
+cogos-recovery status
+cogos-recovery verify
+cogos-first-run status
+cogos-desktop-start
+cogos-device-storage status
+cogos-install plan --target /dev/sdX
 ```
 
-Run tests:
+## Flashing
 
-```bash
-pytest -q
+Use Rufus or another raw-image writer on Windows.
+
+Recommended Rufus mode:
+
+```text
+DD/image mode
 ```
 
----
+## Repository Layout
 
-## 🧩 Voss Binding Bundle
-
-This repository includes a dedicated governance layer:
-
-* Markdown governance artifacts
-* Machine-readable `governance.json`
-* Python implementations for binding + execution
-
-Example usage:
-
-```python
-from evolving_ai.voss_binding import load_governance_bundle
-
-bundle = load_governance_bundle()
-print(bundle["suite"]["name"])
+```text
+AI OS Trixie Build/payload/opt/cogos/   CoGOS runtime, config, docs, examples
+AI OS Trixie Build/payload/usr/local/bin/ Live ISO command wrappers
+AI OS Debian Build/scripts/             Debian remaster script
+AI OS Debian Build/output/*.sha256      Published ISO checksums
+scripts/                                Host-side smoke/remaster/QEMU helpers
 ```
 
----
+## License
 
-## ⚠️ Current Status
+Apache License 2.0. See `LICENSE`.
 
-ARIS is in an **active development and stabilization phase**.
+## Author
 
-* Core system: functional
-* Governance: enforced
-* Runtime builds: in progress
-
----
-
-## 🧭 Philosophy
-
-> Infi = unbounded evolution within bounded law.
-
-ARIS is designed so that:
-
-* testing produces evidence
-* verification determines truth
-* proof grants admission
-
-The system does not drift.
-It evolves under constraint.
-
----
-
-## 📌 Notes
-
-* This is a **system-first project**, not a packaged product (yet)
-* No binaries are distributed in this version
-* Focus is on **architecture, law, and execution integrity**
-
----
-
-## 👤 Author
-
-Jon Halstead
-(@warheart1984-ctrl)
-
----
-## 📄 License
-
-This project is licensed under the Apache License 2.0.
-
-You are free to use, modify, and distribute this software, including for commercial use, under the terms of the license.
-
-See the LICENSE file for details.
-
+Jon Halstead  
+@warheart1984-ctrl
