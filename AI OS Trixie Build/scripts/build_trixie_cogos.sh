@@ -14,9 +14,13 @@ Required Linux tools:
 USAGE
 }
 
-if [[ "${1:-}" == "-h" || "${1:-}" == "--help" || $# -ne 1 ]]; then
+if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
   usage
   exit 0
+fi
+if [[ $# -ne 1 ]]; then
+  usage >&2
+  exit 1
 fi
 
 ISO="$(readlink -f "$1")"
@@ -40,10 +44,10 @@ fi
 rm -rf "$WORK"
 mkdir -p "$WORK/iso" "$WORK/rootfs" "$ROOT/output"
 
-echo "[1/8] Extract ISO contents"
+echo "[1/7] Extract ISO contents"
 xorriso -osirrox on -indev "$ISO" -extract / "$WORK/iso" >/dev/null
 
-echo "[3/8] Locate SquashFS"
+echo "[2/7] Locate SquashFS"
 SFS_SOURCE="$(find "$WORK/iso" -maxdepth 3 -type f -name 'puppy_*.sfs' | head -n 1)"
 if [[ -z "$SFS_SOURCE" ]]; then
   SFS_SOURCE="$(find "$WORK/iso" -maxdepth 3 -type f \( -name '*.sfs' -o -name '*.squashfs' \) | sort | head -n 1)"
@@ -54,16 +58,16 @@ if [[ -z "$SFS_SOURCE" ]]; then
 fi
 SFS_NAME="$(basename "$SFS_SOURCE")"
 
-echo "[4/8] Extract root filesystem: $SFS_NAME"
+echo "[3/7] Extract root filesystem: $SFS_NAME"
 unsquashfs -f -d "$WORK/rootfs" "$SFS_SOURCE"
 
-echo "[5/8] Stage Project Infi / ARIS payload"
+echo "[4/7] Stage Project Infi / ARIS payload"
 rsync -aH "$PAYLOAD/" "$WORK/rootfs/"
-chmod +x "$WORK/rootfs/opt/cogos/bin/cognitive_init" "$WORK/rootfs/opt/cogos/bin/cogos_shell" "$WORK/rootfs/opt/cogos/bin/cogos_boot.py" "$WORK/rootfs/opt/cogos/bin/cogos_daemon.py" "$WORK/rootfs/opt/cogos/bin/cogos_dashboard.py" "$WORK/rootfs/opt/cogos/bin/cogos_operator_boot.py"
+chmod +x "$WORK/rootfs/opt/cogos/bin/"*
 
-echo "[6/8] Install CoGOS PID 1 gatekeeper and startup layer"
-chmod +x "$WORK/rootfs/etc/init.d/90cogos" "$WORK/rootfs/usr/local/bin/cogos-status" "$WORK/rootfs/usr/local/bin/cogos-shell" "$WORK/rootfs/usr/local/bin/cogos-doctor" "$WORK/rootfs/usr/local/bin/cogos-daemon" "$WORK/rootfs/usr/local/bin/cogos-run" "$WORK/rootfs/usr/local/bin/cogos-task" "$WORK/rootfs/usr/local/bin/cogos-trace" "$WORK/rootfs/usr/local/bin/cogos-law" "$WORK/rootfs/usr/local/bin/cogos-admit" "$WORK/rootfs/usr/local/bin/cogos-snapshot" "$WORK/rootfs/usr/local/bin/cogos-reflect" "$WORK/rootfs/usr/local/bin/cogos-dashboard" "$WORK/rootfs/usr/local/bin/cogos-dashboard-start" "$WORK/rootfs/usr/local/bin/cogos-dashboard-stop" "$WORK/rootfs/usr/local/bin/cogos-desktop-hint" "$WORK/rootfs/usr/local/bin/cogos-verify-trace" "$WORK/rootfs/usr/local/bin/cogos-governance-test" "$WORK/rootfs/usr/local/bin/cogos-module" "$WORK/rootfs/usr/local/bin/cogos-traits" "$WORK/rootfs/usr/local/bin/cogos-patterns" "$WORK/rootfs/usr/local/bin/cogos-proof" "$WORK/rootfs/usr/local/bin/cogos-operator" "$WORK/rootfs/usr/local/bin/cogos-perf" "$WORK/rootfs/usr/local/bin/cogos-pid1-proof" "$WORK/rootfs/usr/local/bin/cogos-ul" "$WORK/rootfs/usr/local/bin/cogos-voss"
-chmod +x "$WORK/rootfs/opt/cogos/modules/local/trace_analyzer/trace_analyzer.py" "$WORK/rootfs/opt/cogos/modules/local/bad_mutator/bad_mutator.py" "$WORK/rootfs/opt/cogos/modules/local/invalid_output/invalid_output.py" "$WORK/rootfs/opt/cogos/modules/local/slow_module/slow_module.py"
+echo "[5/7] Install CoGOS PID 1 gatekeeper and startup layer"
+chmod +x "$WORK/rootfs/etc/init.d/90cogos" "$WORK/rootfs/usr/local/bin/"cogos-*
+chmod +x "$WORK/rootfs/opt/cogos/modules/local/"*/*.py
 
 NATIVE_INIT_REAL="$(readlink -f "$WORK/rootfs/usr/sbin/init" 2>/dev/null || true)"
 if [[ -z "$NATIVE_INIT_REAL" || ! -e "$NATIVE_INIT_REAL" ]]; then
@@ -97,10 +101,10 @@ fi
 }
 echo "Preserved native init: /usr/sbin/init.original from ${NATIVE_INIT_REAL#$WORK/rootfs}"
 
-echo "[7/8] Rebuild SquashFS"
+echo "[6/7] Rebuild SquashFS"
 mksquashfs "$WORK/rootfs" "$SFS_SOURCE" -comp xz -b 1M -noappend -all-root
 
-echo "[8/8] Rebuild ISO"
+echo "[7/7] Rebuild ISO"
 if [[ -f "$WORK/iso/isolinux.bin" ]]; then
   EFI_ARGS=()
   if [[ -f "$WORK/iso/boot/efi.img" ]]; then
